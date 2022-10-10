@@ -1,0 +1,30 @@
+T2E80 131:924.070   SEGGER J-Link V6.70e Log File
+T2E80 131:924.112   DLL Compiled: Apr 17 2020 17:55:05
+T2E80 131:924.118   Logging started @ 2021-09-04 03:12
+T2E80 131:924.129 JLINK_SetWarnOutHandler(...)
+T2E80 131:924.133 - 0.006ms
+T2E80 131:924.139 JLINK_OpenEx(...)
+T2E80 131:924.853   
+  ***** Error: 
+T2E80 131:924.863   Cannot connect to J-Link.
+T2E80 131:954.379 - 30.252ms returns "Cannot connect to J-Link."
+T2E80 131:954.577 
+  ***** 
+T2E80 131:954.586 API Error: API JLINK_GetHardwareVersion function called before JLINKARM_Open()
+T2E80 133:279.223 JLINK_IsOpen()
+T2E80 133:279.255 - 0.037ms returns 0x00
+T2E80 133:279.268 JLINK_EMU_SelectByUSBSN(SerialNo = -1)
+T2E80 133:280.350 - 1.092ms returns 0xFFFFFFFF
+T2E80 133:280.371 JLINK_EnableLog(...)
+T2E80 133:280.382 - 0.020ms
+T2E80 133:280.402 JLINK_SetWarnOutHandler(...)
+T2E80 133:280.412 - 0.014ms
+T2E80 133:280.423 JLINK_OpenEx(...)
+T2E80 133:299.329 - 18.922ms returns "Failed to open DLL"
+T2E80 133:299.617 
+  ***** 
+T2E80 133:299.631 API Error: API JLINK_GetHardwareVersion function called before JLINKARM_Open()
+T2E80 134:208.577 JLINK_Close()
+T2E80 134:208.946 - 0.374ms
+T2E80 134:208.953   
+T2E80 134:208.957   Closed
