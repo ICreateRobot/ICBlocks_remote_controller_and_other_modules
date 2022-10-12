@@ -145,11 +145,11 @@ void Interface_module(void)
         }
         else if((2580<=ADC_Value[i])&&(ADC_Value[i]<2675))//开灯
         {
-            Interface[i]=37;//Interface[i]=7;
+            Interface[i]=7;//Interface[i]=7;
         }
         else if((2675<=ADC_Value[i])&&(ADC_Value[i]<2790))//关灯
         {
-            Interface[i]=38;//Interface[i]=8;
+            Interface[i]=8;//Interface[i]=8;
         }
         else if((2790<=ADC_Value[i])&&(ADC_Value[i]<2950))//启动电机
         {
@@ -780,7 +780,7 @@ uint8_t Start_Potentiometer(uint8_t i)
         {
             LED_Flashing_Time=0;
 //            Sendbuff[0]= 47;
-            Sendbuff[0]= 19;
+					                Sendbuff[0]= 19;
 
             send_data_time();
             Set_LED_Num=LED_times;

@@ -371,7 +371,7 @@ uint8_t Loop_one(uint16_t Loop_Times,uint8_t Loop_Start,uint8_t Loop_Stop)   //Ò
                 Motor=Start_Motor_Potentiometer(y);
                 if(Motor==1)
                 {
-                    LED_Flashing(y+1,0);
+			 LED_Flashing(y+1,0);
                 }
                 if(Motor==2)//°´Æô¶¯°´¼üÍË³öÑ­»·
                 {
@@ -482,6 +482,15 @@ void Special_Combination_Module(void)//Ã»ÓÐÑ­»·Ä£¿éµÄÇé¿ö
         Right_Movement(i);
         Left_Movement(i);
     }
+    /***³ÌÐò½áÊø»Ö¸´Ä¬ÈÏ±íÇé***/
+//    Sendbuff[0]= 55;   //½ØÖ¹·û
+    Send_Data(Sendbuff);
+    HAL_Delay(100);
+    Send_Data(Sendbuff);
+    HAL_Delay(100);
+    Send_Data(Sendbuff);
+    HAL_Delay(100);
+    Send_Data(Sendbuff);
 
     Sendbuff[0]= 0;
     Sendbuff1[0]=0;
@@ -558,7 +567,7 @@ uint8_t Start_Motor_Potentiometer(uint8_t i)
 {
     if(Interface[i]==32)  //ÐýÅ¥Ä£¿é
     {
-        LED_Flashing(i+1,0);
+			 LED_Flashing(i+1,0);
         for(uint8_t y=0; y<i; y++)
         {
             GPIO_RESET(y);
@@ -576,7 +585,7 @@ uint8_t Start_Motor_Potentiometer(uint8_t i)
                 {   sport1=1;
                     Sendbuff[0]= 42;
                     send_data_time();
-                    LED_Flashing(i+1,0);
+									LED_Flashing(i+1,0);
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
                     return 1;
@@ -585,7 +594,7 @@ uint8_t Start_Motor_Potentiometer(uint8_t i)
                 {   sport1=1;
                     Sendbuff[0]= 41;
                     send_data_time();
-                    LED_Flashing(i+1,0);
+									LED_Flashing(i+1,0);
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
                     return 1;
@@ -594,7 +603,7 @@ uint8_t Start_Motor_Potentiometer(uint8_t i)
                 {   sport1=1;
                     Sendbuff[0]= 40;
                     send_data_time();
-                    LED_Flashing(i+1,0);
+									LED_Flashing(i+1,0);
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
                     return 1;
@@ -603,7 +612,7 @@ uint8_t Start_Motor_Potentiometer(uint8_t i)
                 {   sport1=1;
                     Sendbuff[0]= 35;//µç»úÍ£Ö¹
                     send_data_time();
-                    LED_Flashing(i+1,0);
+									LED_Flashing(i+1,0);
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
                     return 1;
@@ -612,7 +621,7 @@ uint8_t Start_Motor_Potentiometer(uint8_t i)
                 {   sport1=1;
                     Sendbuff[0]= 43;
                     send_data_time();
-                    LED_Flashing(i+1,0);
+									LED_Flashing(i+1,0);
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
                     return 1;
@@ -621,7 +630,7 @@ uint8_t Start_Motor_Potentiometer(uint8_t i)
                 {   sport1=1;
                     Sendbuff[0]= 44;
                     send_data_time();
-                    LED_Flashing(i+1,0);
+									LED_Flashing(i+1,0);
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
 //                    GPIO_RESET(i+1);//ÁÁ		Interface[i]==2µÄLEDµÆ
                     return 1;
@@ -779,9 +788,7 @@ uint8_t Start_Potentiometer(uint8_t i)
         if(Interface[i]==24)  //±ØÐëÊÇÔË¶¯Ä£¿é)
         {
             LED_Flashing_Time=0;
-//            Sendbuff[0]= 47;
-					                Sendbuff[0]= 19;
-
+            Sendbuff[0]= 47;
             send_data_time();
             Set_LED_Num=LED_times;
             Turn_OFF_LED(i);

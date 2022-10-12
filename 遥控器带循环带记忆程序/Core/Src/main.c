@@ -39,7 +39,6 @@ char SendCom1[16] = "AT+HOSTEN1\r\n";  //定义数据发送数组
 char SendCom2[13] = "AT+NAME25\r\n";  //定义数据发送数组
 
 //Sendbuff[0]= 0;
-uint8_t Turn_OFF=0;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -156,36 +155,28 @@ int main(void)
     while (1)
     {
         /***************断电自动关机********************/
-        if((HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_13)==1))
-        {
-            HAL_Delay(20);
-            if((HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_13)==1))
-            {
-                HAL_GPIO_WritePin(GPIOC,GPIO_PIN_10,GPIO_PIN_RESET);
-                Sendbuff[0]= 10;     //开始标志
-                Send_Data(Sendbuff);
-                Turn_OFF=1;
-            }
-        }
-        else
-        {
-            Turn_OFF=0;
-        }
+//        if((HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_13)==1))
+//        {
+//            HAL_Delay(20);
+//            if((HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_13)==1))
+//            {
+//                HAL_GPIO_WritePin(GPIOC,GPIO_PIN_10,GPIO_PIN_RESET);
+//                while(1);
+//            }
+//        }
         /**********测试遥控器程序*********/
 //        TEST_PRO();//不能用有冲突
         /***********/
         Auto_OFF();    //自动关机检测
         Interface_module();
         Data_Flag=Module_Judge();       //判断数据
-        if(Turn_OFF==0)   //遥控器充电不可以使用
+        if(Data_Flag==1)        //存入数据
         {
-            if(Data_Flag==1)        //存入数据
-            {
-                IOWR();
-            }
-            else if(Data_Flag==2)  //清除数据
-            {
-                Clear_Data(); //清除数据
+            IOWR();
+        }
+        else if(Data_Flag==2)  //清除数据
+        {
+            Clear_Data(); //清除数据
 
 //            Prestore_Times=0;
 //				  	IORD_Sort_Order=0;
@@ -200,55 +191,54 @@ int main(void)
 //							IORD_Loop_Stop[k]=0;
 //            }
 //            Clear_KEY=0;//清零
-            }
-            else if(Data_Flag==0) //没有预存模块
+        }
+        else if(Data_Flag==0) //没有预存模块
+        {
+            if(KEY_Scan()==2)
             {
-                if(KEY_Scan()==2)
-                {
-                    key_running=1;
-                    IORD_Analyse(0);  //读取指令分析
-                    Sendbuff[0]= 38;     //开始标志
-                    Send_Data(Sendbuff);
-                    HAL_Delay(20);
-                    Send_Data(Sendbuff);
-                    HAL_Delay(20);
-                    Interface_module(); //检测指令模块
-                    Circular_Order();
-                    Module_Init();      //只初始化一次函数
+                key_running=1;
+                IORD_Analyse(0);  //读取指令分析
+                Sendbuff[0]= 38;     //开始标志
+                Send_Data(Sendbuff);
+                HAL_Delay(20);
+                Send_Data(Sendbuff);
+                HAL_Delay(20);
+                Interface_module(); //检测指令模块
+                Circular_Order();
+                Module_Init();      //只初始化一次函数
 
-                    for(uint8_t i=0; i<8; i++)
-                    {
-                        GPIO_SET(i);
-                    }
-                    HAL_Delay(300);
-                    Loop_Movement();
-                    /***程序结束之后停止运动****/
-                    IORD_Prestore_Times=0;
-                    IORD_Sort_Order=0;
-                    Sort_Order=0;
-                    HAL_Delay(300);
+                for(uint8_t i=0; i<8; i++)
+                {
+                    GPIO_SET(i);
+                }
+                HAL_Delay(300);
+                Loop_Movement();
+                /***程序结束之后停止运动****/
+                IORD_Prestore_Times=0;
+                IORD_Sort_Order=0;
+                Sort_Order=0;
+                HAL_Delay(300);
 
 //								if(KEY_Scan()==0)
 //								{
 //								while(1);
 //								}
-                    /***程序结束恢复默认表情***/
+                /***程序结束恢复默认表情***/
 //                Sendbuff[0]= 55;   //截止符
 //                Send_Data(Sendbuff);
 //                HAL_Delay(100);
 //                Send_Data(Sendbuff);
-                    if(KEY_Scan()==0)
-                    {
-                        HAL_Delay(300);
-                        key_up=1;
-                    }
-                    if(KEY_Scan()==2)
-                    {
-                        HAL_Delay(3000);
-                        key_up=1;
-                    }
-//            }
+                if(KEY_Scan()==0)
+                {
+                    HAL_Delay(300);
+                    key_up=1;
                 }
+                if(KEY_Scan()==2)
+                {
+                    HAL_Delay(3000);
+                    key_up=1;
+                }
+//            }
             }
         }
         /* USER CODE END WHILE */

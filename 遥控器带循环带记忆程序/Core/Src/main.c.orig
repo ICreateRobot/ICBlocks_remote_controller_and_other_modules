@@ -39,7 +39,6 @@ char SendCom1[16] = "AT+HOSTEN1\r\n";  //定义数据发送数组
 char SendCom2[13] = "AT+NAME25\r\n";  //定义数据发送数组
 
 //Sendbuff[0]= 0;
-uint8_t Turn_OFF=0;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -156,29 +155,21 @@ int main(void)
     while (1)
     {
         /***************断电自动关机********************/
-        if((HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_13)==1))
-        {
-            HAL_Delay(20);
-            if((HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_13)==1))
-            {
-                HAL_GPIO_WritePin(GPIOC,GPIO_PIN_10,GPIO_PIN_RESET);
-                             Sendbuff[0]= 10;     //开始标志
-                Send_Data(Sendbuff);
-                Turn_OFF=1;
-            }
-        }
-								  else
-        {
-            Turn_OFF=0;
-        }
+//        if((HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_13)==1))
+//        {
+//            HAL_Delay(20);
+//            if((HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_13)==1))
+//            {
+//                HAL_GPIO_WritePin(GPIOC,GPIO_PIN_10,GPIO_PIN_RESET);
+//                while(1);
+//            }
+//        }
         /**********测试遥控器程序*********/
 //        TEST_PRO();//不能用有冲突
         /***********/
         Auto_OFF();    //自动关机检测
         Interface_module();
         Data_Flag=Module_Judge();       //判断数据
-								 if(Turn_OFF==0)   //遥控器充电不可以使用
-        {
         if(Data_Flag==1)        //存入数据
         {
             IOWR();
@@ -232,11 +223,15 @@ int main(void)
 //								{
 //								while(1);
 //								}
-                /***程序结束恢复默认表情***/
-//                Sendbuff[0]= 55;   //截止符
-//                Send_Data(Sendbuff);
-//                HAL_Delay(100);
-//                Send_Data(Sendbuff);
+								    /***程序结束恢复默认表情***/
+    Sendbuff[0]= 55;   //截止符
+    Send_Data(Sendbuff);
+    HAL_Delay(100);
+    Send_Data(Sendbuff);
+    HAL_Delay(100);
+    Send_Data(Sendbuff);
+    HAL_Delay(100);
+    Send_Data(Sendbuff);
                 if(KEY_Scan()==0)
                 {
                     HAL_Delay(300);
@@ -250,7 +245,6 @@ int main(void)
 //            }
             }
         }
-			}
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
