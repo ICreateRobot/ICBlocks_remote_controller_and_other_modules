@@ -14,14 +14,13 @@
 #include <string>
 #include <Ticker.h>
 #include <EEPROM.h>
+#include "soc/rtc_wdt.h" //设置看门狗用
 //#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 //#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 //#endif
 //
 //BluetoothSerial SerialBT;
 
-#define SERVICE_UUID "0000ffe0-0000-1000-8000-00805f9b34fb"
-#define CHARACTERISTIC_UUID "0000ffe1-0000-1000-8000-00805f9b34fb"
 
 #define ANALOG_PIN_0   36  //右Y摇杆 上小下大
 #define ANALOG_PIN_1   39  //右X摇杆 左小右大
@@ -74,6 +73,8 @@ char key;
 //蓝牙
 BLEAdvertisedDevice* pServer;
 BLERemoteCharacteristic* pRemoteCharacteristic;
+#define SERVICE_UUID "0000ffe0-0000-1000-8000-00805f9b34fb"
+#define CHARACTERISTIC_UUID "0000ffe1-0000-1000-8000-00805f9b34fb"
 
 uint8_t BLE_OUT[6];
 BLEClient* pClient  = BLEDevice::createClient(); // 创建客户端
@@ -86,20 +87,6 @@ uint8_t Last_BLE_Pattern;//上次蓝牙的模式
 uint8_t Push_EN = false;
 uint8_t Push_Buff_Count;
 
-// 搜索到设备时回调功能
-/*
-  class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
-    void onResult(BLEAdvertisedDevice advertisedDevice) {
-      if (advertisedDevice.haveServiceUUID() && (String)(advertisedDevice.getServiceUUID().toString().c_str()) == SERVICE_UUID) //寻找到UUID符合要求的主机
-      {
-        advertisedDevice.getScan()->stop(); // 停止当前扫描
-        pServer = new BLEAdvertisedDevice(advertisedDevice); // 暂存设备
-        doConnect = true;
-        Serial.println("发现想要连接的设备");
-      }
-    }
-  };
-*/
 // 搜索到设备时回调功能
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     void onResult(BLEAdvertisedDevice advertisedDevice) {
@@ -130,24 +117,6 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
 };
 
 // 客户端与服务器连接与断开回调功能
-/*
-  class MyClientCallback : public BLEClientCallbacks {
-    void onConnect(BLEClient* pclient) {}
-    void onDisconnect(BLEClient* pclient) {
-      connected = false;
-
-      leds[0] = CRGB::Yellow;
-      //leds[0] = CRGB ( 255, 0, 0);
-      FastLED.show();
-      ESP.restart();  //重启复位esp32
-      //leds[0] = CRGB ( 255, 0, 0);
-      leds[0] = CRGB::Yellow;
-      FastLED.show();
-      Serial.println("失去与设备的连接");
-    }
-  };
-*/
-// 客户端与服务器连接与断开回调功能
 class MyClientCallback : public BLEClientCallbacks {
     void onConnect(BLEClient* pclient) {
       leds[0] = CRGB ( 0, 0, 250);
@@ -173,8 +142,6 @@ class MyClientCallback : public BLEClientCallbacks {
       FastLED.show();
       Serial.println("失去与设备的连接3");
       ESP.restart();
-      //      pixels.setPixelColor(0, pixels.Color(200, 0, 0)); //注意是从0开始，第一个led对应0
-      //      pixels.show();//刷新
       leds[0] = CRGB ( 255, 0, 0);
       FastLED.show();
       Serial.println("失去与设备的连接2");
@@ -229,6 +196,7 @@ bool ConnectToServer(void) {
   if (pRemoteCharacteristic->canRead()) { // 如果特征值可以读取则读取数据
     Serial.printf("该特征值可以读取并且当前值为: %s\r\n", pRemoteCharacteristic->readValue().c_str());
   }
+  Push_EN = true;
   if (pRemoteCharacteristic->canNotify()) { // 如果特征值启用了推送则添加推送接收处理
     pRemoteCharacteristic->registerForNotify(NotifyCallback);
   }
@@ -236,28 +204,28 @@ bool ConnectToServer(void) {
 //试图连接蓝牙
 void Connect_ble()
 {
-  if(doSacn == true)
+  if (doSacn == true)
   {
-  if ((BLE_Pattern != 5)) //确定不是不需要连接
-    if (BLE_Pattern != 3) //搜索之后太久没连上需要重新搜索
-    {
-      if ((millis() - BLE_Search_Begin_Time) > 3000)
+    if ((BLE_Pattern != 5)) //确定不是不需要连接
+      if (BLE_Pattern != 3) //搜索之后太久没连上需要重新搜索
       {
-        BLE_Pattern = 0;
+        if ((millis() - BLE_Search_Begin_Time) > 3000)
+        {
+          BLE_Pattern = 0;
+        }
+        Last_BLE_Pattern = BLE_Pattern;
       }
-      Last_BLE_Pattern = BLE_Pattern;
-    }
 
-  if (BLE_Pattern == 0) //蓝牙状态未知
-  {
-    BLE_Mac = EEPROM.readString(2);
-    Serial.println("开始搜索设备5");
-    BLE_Pattern = 1; //1 打开搜索 搜索指定MAC
-    BLEDevice::getScan()->clearResults();
-    BLEDevice::getScan()->start(3, false);
-    BLE_Search_Begin_Time = millis();
-    Serial.println(BLE_Mac);
-  }
+    if (BLE_Pattern == 0) //蓝牙状态未知
+    {
+      BLE_Mac = EEPROM.readString(2);
+      Serial.println("开始搜索设备5");
+      BLE_Pattern = 1; //1 打开搜索 搜索指定MAC
+      BLEDevice::getScan()->clearResults();
+      BLEDevice::getScan()->start(3, false);
+      BLE_Search_Begin_Time = millis();
+      Serial.println(BLE_Mac);
+    }
   }
   // 如果按键按下
   //if (Key.T)
@@ -309,20 +277,20 @@ uint8_t power_key_flag = 1;
 
 void Shutdown(void)
 {
-  analog_value4 = analogRead(ANALOG_PIN_4);
-  if (analog_value4 > 4000)
+  //analog_value4 = analogRead(ANALOG_PIN_4);
+  if (analogRead(ANALOG_PIN_4) > 4000)
   {
     power_key_flag = 1;
   }
   if ((power_flag == 0) && (power_key_flag == 1)) //开机
   {
-    if (analog_value4 <= 3800)
+    if (analogRead(ANALOG_PIN_4) <= 3800)
     {
       delay(10);
-      if (analog_value4 <= 3800)
+      if (analogRead(ANALOG_PIN_4) <= 3800)
       {
         delay(10);
-        if (analog_value4 <= 3800)
+        if (analogRead(ANALOG_PIN_4) <= 3800)
         {
           Serial.println("开机");
 
@@ -339,14 +307,14 @@ void Shutdown(void)
   }
   else if ((power_flag == 1) && (power_key_flag == 1)) //关机
   { //Serial.println("关机1");
-    if (analog_value4 <= 2500)
+    if (analogRead(ANALOG_PIN_4) <= 2500)
     {
       Serial.println("关机2");
       delay(10);
-      if (analog_value4 <= 2500)
+      if (analogRead(ANALOG_PIN_4) <= 2500)
       { Serial.println("关机3");
         delay(10);
-        if (analog_value4 <= 2500)
+        if (analogRead(ANALOG_PIN_4) <= 2500)
         {
           leds[0] = CRGB ( 0, 0, 0);//leds[0] = CRGB::Red;          // 设置灯带中第一个灯珠颜色为红色，leds[0]为第一个灯珠，leds[1]为第二个灯珠
           FastLED.show();               // 更新LED色彩
@@ -417,7 +385,7 @@ void  Matrices_KEY_Control(void)  //矩阵按键控制
     BLOCKS_DATA = 15;//后退一步
   }
   //开关灯
-  else if (key == '8')  //开关灯按键
+  else if (key == '6')  //开关灯按键5555
   {
     if (Light_flag == 0)
     {
@@ -431,10 +399,10 @@ void  Matrices_KEY_Control(void)  //矩阵按键控制
     }
   }
   //表情模块
-  else if ((key == '7') && (Expression_OPEN == 1)) //切换表情
+  else if ((key == '5') && (Expression_OPEN == 1)) //切换表情
   {
     delay(200);
-    if ((key == '7') && (Expression_OPEN == 1))
+    if ((key == '5') && (Expression_OPEN == 1))
     {
       Expression_flag++;
       if (Expression_flag >= 6)
@@ -465,10 +433,10 @@ void  Matrices_KEY_Control(void)  //矩阵按键控制
     }
   }
   //声音模块
-  else if ((key == '6') && (Voice_OPEN == 1)) //切换声音按键
+  else if ((key == '8') && (Voice_OPEN == 1)) //切换声音按键
   {
     delay(200);
-    if (key == '6')
+    if (key == '8')
     {
       Voice_flag++;
       if (Voice_flag > 6)
@@ -502,10 +470,10 @@ void  Matrices_KEY_Control(void)  //矩阵按键控制
       Voice_OPEN = 0;
     }
   }
-  else if (key == '5')  //播放当前声音按键
+  else if (key == '7')  //播放当前声音按键
   {
     delay(200);
-    if (key == '5')
+    if (key == '7')
     {
       if ( Voice_flag == 1 )
       {
@@ -586,22 +554,22 @@ void Read_Rocker()//读取摇杆
   Calculate(&RR_Y);
   // key = keypad.getKey();
   //if ((Key.Power_L + Key.Power_R) == 2)
-  
-  if ((digitalRead(R_M)==0)&&(digitalRead(L_M)==0))
-  {Serial.println(668);
+
+  if ((digitalRead(R_M) == 0) && (digitalRead(L_M) == 0))
+  { Serial.println(668);
     uint16_t Trigger_time = 1000;
-// KEY0 = digitalRead(R_U);
-//  KEY1 = digitalRead(R_D);
-//  KEY2 = digitalRead(R_M);
-//  KEY3 = digitalRead(L_M);
-    while ((digitalRead(R_M)==0)&&(digitalRead(L_M)==0))
-    { 
+    // KEY0 = digitalRead(R_U);
+    //  KEY1 = digitalRead(R_D);
+    //  KEY2 = digitalRead(R_M);
+    //  KEY3 = digitalRead(L_M);
+    while ((digitalRead(R_M) == 0) && (digitalRead(L_M) == 0))
+    {
       Trigger_time --;
       //Get_Key();
-      
+
       delay(1);
       Serial.println(Trigger_time);
-      
+
       //key = keypad.getKey();
       Serial.println(key);
       if (Trigger_time == 0)
@@ -671,12 +639,12 @@ void Read_Rocker()//读取摇杆
       {
         RR_Y.MIN = RR_Y.Data;
       }
-//      Serial.print("最大");
-//      Serial.println(RR_X.MAX);
-key = keypad.getKey();
-     // if (analogRead(ANALOG_PIN_4) < 4000)
-     if (key=='*')
-      {Serial.print("最大");
+      //      Serial.print("最大");
+      //      Serial.println(RR_X.MAX);
+      key = keypad.getKey();
+      // if (analogRead(ANALOG_PIN_4) < 4000)
+      if (key == '*')
+      { Serial.print("最大");
         EEPROM.writeShort(50, (int16_t)RL_X.MAX - MED_Threshold);
         EEPROM.writeShort(55, (int16_t)RL_X.MED);
         EEPROM.writeShort(60, (int16_t)RL_X.MIN + MED_Threshold);
@@ -807,8 +775,8 @@ void ADC_Control(void)
       BLOCKS_DATA = 35;//电机停止
     }
   }
-   //Serial.println(RR_X.Equivalence);
-   //Serial.print(" ");
+  //Serial.println(RR_X.Equivalence);
+  //Serial.print(" ");
   // Serial.println(RR_Y.Equivalence);
   // Serial.print(" ");
   ////左摇杆 上下左右
@@ -919,23 +887,27 @@ void setup() {
   EEPROM.begin(200);
   Read_Rocker_Parameter();//读摇杆的参数
   //touchAttachInterrupt(digitalPinToInterrupt(22), TouchEvent, FALLING);
+rtc_wdt_protect_off();     //看门狗写保护关闭 关闭后可以喂狗
+rtc_wdt_enable();          //启用看门狗
+rtc_wdt_set_time(RTC_WDT_STAGE0, 10000); // 设置看门狗超时 10000ms.则reset重启
 }
 void loop() {
   Shutdown();
+  rtc_wdt_feed();  //喂狗函数
   //  Serial.println(BLE_Pattern);
   //  Serial.println(BLE_Mac);
-   Read_Rocker();//读取摇杆
-   //Serial.println(RL_X.Equivalence);
-   //Serial.print(" ");
-   Serial.println(RL_Y.Equivalence);
+  Read_Rocker();//读取摇杆
+  //Serial.println(RL_X.Equivalence);
+  //Serial.print(" ");
+  Serial.println(RL_Y.Equivalence);
   // Serial.print(" ");
-   //Serial.println(RR_X.Equivalence);
-   //Serial.print(" ");
-   Serial.println(RR_Y.Equivalence);
+  //Serial.println(RR_X.Equivalence);
+  //Serial.print(" ");
+  Serial.println(RR_Y.Equivalence);
   // Serial.print(" ");
   key = keypad.getKey();
   if (key != NO_KEY) {
-   // Serial.println(key);
+    // Serial.println(key);
   }
   else
   {
