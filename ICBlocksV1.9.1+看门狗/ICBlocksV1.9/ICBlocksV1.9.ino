@@ -15,6 +15,12 @@
 #include <Ticker.h>
 #include <EEPROM.h>
 #include "soc/rtc_wdt.h" //设置看门狗用
+#include "esp_system.h"
+
+//
+const int wdtTimeout = 3000;  //time in ms to trigger the watchdog
+hw_timer_t *timer = NULL;
+//
 //#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 //#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 //#endif
@@ -258,8 +264,23 @@ void Connect_ble()
   }
 
 }
-
-
+//
+void IRAM_ATTR resetModule() {
+  ets_printf("reboot\n");
+  //leds[0] = CRGB(0,0,0);
+  leds[0] = CRGB::Red;          // 设置灯带中第一个灯珠颜色为红色，leds[0]为第一个灯珠，leds[1]为第二个灯珠
+  FastLED.show();               // 更新LED色彩
+  esp_restart();
+  ESP.restart();
+  while (1)
+  {
+    digitalWrite(powerout, LOW);
+    digitalWrite(powerout, LOW);
+    ets_printf("reboot1\n");
+    ESP.restart();
+  }
+}
+//
 int SELECT_LEVEL = 0;
 int BLOCKS_DATA = 0;
 //uint8_t BLOCKS_DATA[] = {0xfe, 0, 0, 0, 0, 0, 0, 0xfc};
@@ -836,14 +857,13 @@ void ADC_Control(void)
 
 //定时器中断
 /*定义定时器指针*/
-hw_timer_t *timer = NULL;
-void IRAM_ATTR InterruptEvent()
-{
-  if (((analog_value0 > 1100) && (analog_value0 < 2200) && (analog_value2 > 1100) && (analog_value2 < 2200) && (analog_value3 > 1500) && (analog_value3 < 2100)) && running_flag == 1)
-  {
-    // BLOCKS_DATA[1] = 0x20;//
-  }
-}
+//void IRAM_ATTR InterruptEvent()
+//{
+//  if (((analog_value0 > 1100) && (analog_value0 < 2200) && (analog_value2 > 1100) && (analog_value2 < 2200) && (analog_value3 > 1500) && (analog_value3 < 2100)) && running_flag == 1)
+//  {
+//    // BLOCKS_DATA[1] = 0x20;//
+//  }
+//}
 //
 //void TouchEvent()
 //{
@@ -880,21 +900,27 @@ void setup() {
   pBLEScan->setInterval(100);
   pBLEScan->setWindow(80);
   /*定时器部分*/
-  timer = timerBegin(0, 80, true);                    //定时器初始化--80Mhz分频80，则时间单位为1Mhz即1us即10-6s，下面的300000us即300ms。
-  timerAttachInterrupt(timer, &InterruptEvent, true); //中断绑定定时器
-  timerAlarmWrite(timer, 100000, true);               //300ms进入一次中断--注意这里不能用另一个函数：timerWrite（timer,300000）；实测用这个函数不行。
-  timerAlarmEnable(timer);                            //使能定时器
+  //  timer = timerBegin(0, 80, true);                    //定时器初始化--80Mhz分频80，则时间单位为1Mhz即1us即10-6s，下面的300000us即300ms。
+  //  timerAttachInterrupt(timer, &InterruptEvent, true); //中断绑定定时器
+  //  timerAlarmWrite(timer, 100000, true);               //300ms进入一次中断--注意这里不能用另一个函数：timerWrite（timer,300000）；实测用这个函数不行。
+  //  timerAlarmEnable(timer);                            //使能定时器
   EEPROM.begin(200);
   Read_Rocker_Parameter();//读摇杆的参数
   //touchAttachInterrupt(digitalPinToInterrupt(22), TouchEvent, FALLING);
-rtc_wdt_protect_off();     //看门狗写保护关闭 关闭后可以喂狗
-rtc_wdt_enable();          //启用看门狗
-rtc_wdt_set_time(RTC_WDT_STAGE0, 10000); // 设置看门狗超时 10000ms.则reset重启
+  rtc_wdt_protect_off();     //看门狗写保护关闭 关闭后可以喂狗
+  rtc_wdt_enable();          //启用看门狗
+  rtc_wdt_set_time(RTC_WDT_STAGE0, 10000); // 设置看门狗超时 10000ms.则reset重启
+  timer = timerBegin(0, 800, true);                  //timer 0, div 80
+  timerAttachInterrupt(timer, &resetModule, true);  //attach callback
+  timerAlarmWrite(timer, wdtTimeout * 1000, false); //set time in us
+  timerAlarmEnable(timer);                          //enable interrupt
+
 }
 void loop() {
   Shutdown();
   rtc_wdt_feed();  //喂狗函数
-  //  Serial.println(BLE_Pattern);
+  timerWrite(timer, 0); //reset timer (feed watchdog)
+  Serial.println("jdncskjzvfs");
   //  Serial.println(BLE_Mac);
   Read_Rocker();//读取摇杆
   //Serial.println(RL_X.Equivalence);
