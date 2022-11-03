@@ -14,18 +14,12 @@
 #include <string>
 #include <Ticker.h>
 #include <EEPROM.h>
-#include "soc/rtc_wdt.h" //设置看门狗用
 #include "esp_system.h"
 
 //
 const int wdtTimeout = 3000;  //time in ms to trigger the watchdog
 hw_timer_t *timer = NULL;
-//
-//#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
-//#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
-//#endif
-//
-//BluetoothSerial SerialBT;
+
 
 
 #define ANALOG_PIN_0   36  //右Y摇杆 上小下大
@@ -577,22 +571,13 @@ void Read_Rocker()//读取摇杆
   //if ((Key.Power_L + Key.Power_R) == 2)
 
   if ((digitalRead(R_M) == 0) && (digitalRead(L_M) == 0))
-  { Serial.println(668);
-    uint16_t Trigger_time = 1000;
-    // KEY0 = digitalRead(R_U);
-    //  KEY1 = digitalRead(R_D);
-    //  KEY2 = digitalRead(R_M);
-    //  KEY3 = digitalRead(L_M);
+  { 
+    uint16_t Trigger_time = 600;
     while ((digitalRead(R_M) == 0) && (digitalRead(L_M) == 0))
     {
       Trigger_time --;
-      //Get_Key();
-
       delay(1);
       Serial.println(Trigger_time);
-
-      //key = keypad.getKey();
-      Serial.println(key);
       if (Trigger_time == 0)
       {
         ADC_Collection();
@@ -609,9 +594,7 @@ void Read_Rocker()//读取摇杆
         RL_Y.MAX = 0;
         RL_Y.MIN = 0xffff;
         RL_Y.MED = analog_value3;
-        // pixels.setPixelColor(0, pixels.Color(200, 0, 200)); //注意是从0开始，第一个led对应0
         leds[0] = CRGB(200, 0, 200);
-        //pixels.show();//刷新
         FastLED.show();               // 更新LED色彩
         break;
       }
@@ -660,10 +643,7 @@ void Read_Rocker()//读取摇杆
       {
         RR_Y.MIN = RR_Y.Data;
       }
-      //      Serial.print("最大");
-      //      Serial.println(RR_X.MAX);
       key = keypad.getKey();
-      // if (analogRead(ANALOG_PIN_4) < 4000)
       if (key == '*')
       { Serial.print("最大");
         EEPROM.writeShort(50, (int16_t)RL_X.MAX - MED_Threshold);
@@ -684,7 +664,6 @@ void Read_Rocker()//读取摇杆
 
         EEPROM.end();
         leds[0] = CRGB(200, 0, 0);
-        //pixels.show();//刷新
         FastLED.show();               // 更新LED色彩
         break;
       }
@@ -742,8 +721,6 @@ void ADC_Control(void)
     BLOCKS_DATA = 35;
     motor_flag = 0;
   }
-  //  if (((analog_value2 > 1000) && (analog_value2 < 3000)) || ((analog_value3 > 1000) && (analog_value3 < 3000)))
-  //  {
   if (RL_Y.Equivalence < 50)
   {
     if (KEY_DOWN == 3)
@@ -796,10 +773,6 @@ void ADC_Control(void)
       BLOCKS_DATA = 35;//电机停止
     }
   }
-  //Serial.println(RR_X.Equivalence);
-  //Serial.print(" ");
-  // Serial.println(RR_Y.Equivalence);
-  // Serial.print(" ");
   ////左摇杆 上下左右
   if (running_flag == 1)
   {
@@ -856,19 +829,6 @@ void ADC_Control(void)
 }
 
 //定时器中断
-/*定义定时器指针*/
-//void IRAM_ATTR InterruptEvent()
-//{
-//  if (((analog_value0 > 1100) && (analog_value0 < 2200) && (analog_value2 > 1100) && (analog_value2 < 2200) && (analog_value3 > 1500) && (analog_value3 < 2100)) && running_flag == 1)
-//  {
-//    // BLOCKS_DATA[1] = 0x20;//
-//  }
-//}
-//
-//void TouchEvent()
-//{
-//    Serial.printf("Touch Event.\r\n");
-//}
 
 void setup() {
   Serial.begin(9600);
@@ -899,17 +859,10 @@ void setup() {
   pBLEScan->setActiveScan(true);
   pBLEScan->setInterval(100);
   pBLEScan->setWindow(80);
-  /*定时器部分*/
-  //  timer = timerBegin(0, 80, true);                    //定时器初始化--80Mhz分频80，则时间单位为1Mhz即1us即10-6s，下面的300000us即300ms。
-  //  timerAttachInterrupt(timer, &InterruptEvent, true); //中断绑定定时器
-  //  timerAlarmWrite(timer, 100000, true);               //300ms进入一次中断--注意这里不能用另一个函数：timerWrite（timer,300000）；实测用这个函数不行。
-  //  timerAlarmEnable(timer);                            //使能定时器
+  
   EEPROM.begin(200);
   Read_Rocker_Parameter();//读摇杆的参数
-  //touchAttachInterrupt(digitalPinToInterrupt(22), TouchEvent, FALLING);
-  rtc_wdt_protect_off();     //看门狗写保护关闭 关闭后可以喂狗
-  rtc_wdt_enable();          //启用看门狗
-  rtc_wdt_set_time(RTC_WDT_STAGE0, 10000); // 设置看门狗超时 10000ms.则reset重启
+  /*看门狗*/
   timer = timerBegin(0, 800, true);                  //timer 0, div 80
   timerAttachInterrupt(timer, &resetModule, true);  //attach callback
   timerAlarmWrite(timer, wdtTimeout * 1000, false); //set time in us
@@ -918,7 +871,6 @@ void setup() {
 }
 void loop() {
   Shutdown();
-  rtc_wdt_feed();  //喂狗函数
   timerWrite(timer, 0); //reset timer (feed watchdog)
   Serial.println("jdncskjzvfs");
   //  Serial.println(BLE_Mac);
