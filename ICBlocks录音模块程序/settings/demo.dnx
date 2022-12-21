@@ -39,7 +39,7 @@
         <Sort>4 0</Sort>
     </SfrWindow>
     <DebugChecksum>
-        <Checksum>3422182849</Checksum>
+        <Checksum>3171006291</Checksum>
     </DebugChecksum>
     <CallStack>
         <ShowArgs>0</ShowArgs>
@@ -65,8 +65,9 @@
         <Count>0</Count>
     </Breakpoints>
     <Aliases>
-        <Count>0</Count>
-        <SuppressDialog>0</SuppressDialog>
+        <A0>_ "C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_cap\main.c" ""</A0>
+        <Count>1</Count>
+        <SuppressDialog>1</SuppressDialog>
     </Aliases>
     <DebuggerSettings>
         <DisableInterruptsWhenStepping>0</DisableInterruptsWhenStepping>

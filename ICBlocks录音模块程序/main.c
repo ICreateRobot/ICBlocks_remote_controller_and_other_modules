@@ -51,7 +51,7 @@ void main(void)
   GPIO_DeInit(GPIOB);
   GPIO_DeInit(GPIOA);
   GPIO_Init(GPIOC, GPIO_PIN_3, GPIO_MODE_OUT_PP_HIGH_FAST);//初始化高速推挽高电平
-  GPIO_Init(GPIOB, GPIO_PIN_4, GPIO_MODE_OUT_PP_HIGH_FAST);//初始化高速推挽高电平
+  GPIO_Init(GPIOC, GPIO_PIN_4, GPIO_MODE_OUT_PP_HIGH_FAST);//初始化高速推挽高电平
   GPIO_Init(GPIOA, GPIO_PIN_1, GPIO_MODE_OUT_PP_HIGH_FAST);//初始化高速推挽高电平
   GPIO_Init(GPIOA, GPIO_PIN_2, GPIO_MODE_OUT_PP_HIGH_FAST);//初始化高速推挽高电平
   enableInterrupts();
@@ -101,14 +101,14 @@ void main(void)
 
     
     // B4 录音
-    if(GPIO_ReadInputPin(GPIOB, GPIO_PIN_4) == 0){
+    if(GPIO_ReadInputPin(GPIOC, GPIO_PIN_4) == 0){
       
       mprintf("luyin ing....   ! \r\n");
       wtctrl(0xFE);   //充当唤醒功能，提前唤醒IC
       delay_ms(20); 
       wtctrl(0xF5);  //一线录音开始
       //delay_ms(50);
-      while(GPIO_ReadInputPin(GPIOB, GPIO_PIN_4) == 0){  }
+      while(GPIO_ReadInputPin(GPIOC, GPIO_PIN_4) == 0){  }
       delay_ms(100);
       wtctrl( 0xFE);     //停止录音
 

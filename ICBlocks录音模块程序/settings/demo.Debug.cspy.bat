@@ -25,7 +25,7 @@ if not "%~1" == "" goto debugFile
 
 @echo on 
 
-"D:\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_cap\settings\demo.Debug.general.xcl" --backend -f "C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_cap\settings\demo.Debug.driver.xcl" 
+"D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "E:\ICRobot\ICBlocks\ICBlocks录音模块程序\settings\demo.Debug.general.xcl" --backend -f "E:\ICRobot\ICBlocks\ICBlocks录音模块程序\settings\demo.Debug.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"D:\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_cap\settings\demo.Debug.general.xcl" "--debug_file=%~1" --backend -f "C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_cap\settings\demo.Debug.driver.xcl" 
+"D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "E:\ICRobot\ICBlocks\ICBlocks录音模块程序\settings\demo.Debug.general.xcl" "--debug_file=%~1" --backend -f "E:\ICRobot\ICBlocks\ICBlocks录音模块程序\settings\demo.Debug.driver.xcl" 
 
 @echo off 
 :end

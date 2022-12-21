@@ -1,20 +1,20 @@
-"C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_cap\main.c"
+"E:\ICRobot\ICBlocks\ICBlocks录音模块程序\main.c"
 -std=c99
 -ferror-limit=0
 -I
-C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_cap
+E:\ICRobot\ICBlocks\ICBlocks录音模块程序
 -I
-C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_cap\STM8S_StdPeriph_Driver\inc
+E:\ICRobot\ICBlocks\ICBlocks录音模块程序\STM8S_StdPeriph_Driver\inc
 -I
 C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_stm8s\STM8S_StdPeriph_Driver\src
 -I
-D:\IAR Systems\Embedded Workbench 8.0\stm8\inc
+D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\stm8\inc
 -I
-D:\IAR Systems\Embedded Workbench 8.0\stm8\inc\c
+D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\stm8\inc\c
 -I
-C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_cap
+E:\ICRobot\ICBlocks\ICBlocks录音模块程序
 -I
-C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_cap\STM8S_StdPeriph_Driver\inc
+E:\ICRobot\ICBlocks\ICBlocks录音模块程序\STM8S_StdPeriph_Driver\inc
 -I
 C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_stm8s\STM8S_StdPeriph_Driver\src
 -D__CHAR_BITS__=8
@@ -265,8 +265,8 @@ C:\Users\Mr.Li\Desktop\icblocks_Pro\icblocks_luyin_stm8s\STM8S_StdPeriph_Driver\
 -D__EDG_SYSV=0
 -D__EDG_ANSIC=1
 -D__EDG_CPP11_IL_EXTENSIONS_SUPPORTED=1
--D_DLIB_CONFIG_FILE_HEADER_NAME="D:\IAR Systems\Embedded Workbench 8.0\stm8\LIB\dlstm8mmn.h"
--D_DLIB_CONFIG_FILE_STRING="D:\\IAR Systems\\Embedded Workbench 8.0\\stm8\\LIB\\dlstm8mmn.h"
+-D_DLIB_CONFIG_FILE_HEADER_NAME="D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\stm8\LIB\dlstm8mmn.h"
+-D_DLIB_CONFIG_FILE_STRING="D:\\Program Files (x86)\\IAR Systems\\Embedded Workbench 8.0\\stm8\\LIB\\dlstm8mmn.h"
 -D__VERSION__="IAR C/C++ Compiler V3.10.1.201 for STM8"
 -D__CODE_MEMORY_LIST1__()=__CODE_MEM_HELPER1__(__code, 0 )
 -D__CODE_MEMORY_LIST2__(_P1)=__CODE_MEM_HELPER2__(__code, 0 ,  _P1 )
